@@ -30,6 +30,8 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         llm_call_id INTEGER,
         rule_score REAL,
+        judge_score REAL,
+        judge_reasoning TEXT,
         details TEXT,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(llm_call_id) REFERENCES llm_calls(id)
