@@ -2,6 +2,7 @@ from app.db.database import get_connection
 from app.services.ollama_client import generate_response
 from app.utils.token_counter import count_tokens
 from app.utils.cost_estimator import estimate_cost
+from app.services.evaluation_logger import run_rule_evaluation
 
 MODEL_NAME = "tinyllama"
 
@@ -10,11 +11,7 @@ def log_llm_call(prompt: str):
 
     input_tokens = count_tokens(prompt)
     output_tokens = count_tokens(response)
-    estimated_cost = estimate_cost(
-        MODEL_NAME,
-        input_tokens,
-        output_tokens
-    )
+    estimated_cost = estimate_cost(MODEL_NAME, input_tokens, output_tokens)
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -39,8 +36,13 @@ def log_llm_call(prompt: str):
         )
     )
 
+    llm_call_id = cursor.lastrowid
     conn.commit()
     conn.close()
+
+    rule_score, rule_details = run_rule_evaluation(
+        llm_call_id, prompt, response
+    )
 
     return {
         "prompt": prompt,
@@ -48,6 +50,8 @@ def log_llm_call(prompt: str):
         "input_tokens": input_tokens,
         "output_tokens": output_tokens,
         "estimated_cost": estimated_cost,
-        "latency_ms": latency_ms
+        "latency_ms": latency_ms,
+        "rule_score": rule_score,
+        "rule_details": rule_details
     }
 

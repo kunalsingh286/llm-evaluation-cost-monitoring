@@ -25,6 +25,17 @@ def init_db():
     )
     """)
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS evaluations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        llm_call_id INTEGER,
+        rule_score REAL,
+        details TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(llm_call_id) REFERENCES llm_calls(id)
+    )
+    """)
+
     conn.commit()
     conn.close()
 
