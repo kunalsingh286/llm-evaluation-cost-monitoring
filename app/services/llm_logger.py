@@ -6,7 +6,7 @@ from app.services.evaluation_logger import run_full_evaluation
 
 MODEL_NAME = "tinyllama"
 
-def log_llm_call(prompt: str):
+def log_llm_call(prompt: str, prompt_version: str = "v1"):
     response, latency_ms = generate_response(prompt)
 
     input_tokens = count_tokens(prompt)
@@ -19,14 +19,15 @@ def log_llm_call(prompt: str):
     cursor.execute(
         """
         INSERT INTO llm_calls (
-            prompt, response, model,
+            prompt, prompt_version, response, model,
             input_tokens, output_tokens,
             estimated_cost, latency_ms
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             prompt,
+            prompt_version,
             response,
             MODEL_NAME,
             input_tokens,
@@ -45,12 +46,8 @@ def log_llm_call(prompt: str):
     )
 
     return {
-        "prompt": prompt,
-        "response": response,
-        "input_tokens": input_tokens,
-        "output_tokens": output_tokens,
-        "estimated_cost": estimated_cost,
-        "latency_ms": latency_ms,
+        "llm_call_id": llm_call_id,
+        "prompt_version": prompt_version,
         **evaluation
     }
 

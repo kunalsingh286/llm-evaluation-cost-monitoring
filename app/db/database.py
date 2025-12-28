@@ -15,6 +15,7 @@ def init_db():
     CREATE TABLE IF NOT EXISTS llm_calls (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         prompt TEXT,
+        prompt_version TEXT,
         response TEXT,
         model TEXT,
         input_tokens INTEGER,
@@ -35,6 +36,17 @@ def init_db():
         details TEXT,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(llm_call_id) REFERENCES llm_calls(id)
+    )
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS regressions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        old_call_id INTEGER,
+        new_call_id INTEGER,
+        score_delta REAL,
+        verdict TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
