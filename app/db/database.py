@@ -17,6 +17,9 @@ def init_db():
         prompt TEXT,
         response TEXT,
         model TEXT,
+        input_tokens INTEGER,
+        output_tokens INTEGER,
+        estimated_cost REAL,
         latency_ms REAL,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     )
@@ -24,3 +27,4 @@ def init_db():
 
     conn.commit()
     conn.close()
+
